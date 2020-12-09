@@ -46,7 +46,7 @@ class Wukong(object):
 '''.format(config.get('/server/host', '0.0.0.0'), config.get('/server/port', '5000')))
         config.init()
         self._conversation = Conversation(self._profiling)
-        self._conversation.say('{} 你好！试试对我喊唤醒词叫醒我吧'.format(config.get('first_name', '主人')), True)
+        self._conversation.say('{} 你好！'.format(config.get('first_name', '主人')), True)
         self._observer = Observer()
         event_handler = ConfigMonitor(self._conversation)
         self._observer.schedule(event_handler, constants.CONFIG_PATH, False)

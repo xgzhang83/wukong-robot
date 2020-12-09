@@ -10,6 +10,7 @@ from robot.Brain import Brain
 from robot.sdk import LED, MessageBuffer
 from snowboy import snowboydecoder
 from robot import logging, ASR, TTS, NLU, AI, Player, config, constants, utils, statistic
+import requests, json, urllib
 
 
 logger = logging.getLogger(__name__)
@@ -55,6 +56,44 @@ class Conversation(object):
     def checkRestore(self):
         if self.immersiveMode:
             self.brain.restore()
+
+    def getResponse(self, query, UUID='', onSay=None):
+        statistic.report(1)
+        self.interrupt()
+        self.appendHistory(0, query, UUID)
+
+        if onSay:
+            self.onSay = onSay
+
+        if query.strip() == '':
+            self.pardon()
+            return
+
+        # # url = "http://10.123.11.99:5000/message"
+        # r = requests.post(url, data = json.dumps(postDict), headers={'Content-Type':'application/json'})
+
+        url = "http://zhang.wrdtech.com/robot/"
+        postDict = {
+            # "sender": "raspberry",
+            # "text": query
+            "message": query,
+        }
+        payload = urllib.parse.urlencode(postDict)
+
+        headers = {
+            'content-type': "application/x-www-form-urlencoded",
+            'cache-control': "no-cache",
+        }
+        r = requests.request("POST", url, data=payload, headers=headers)
+
+        logger.debug("response status_code: {}".format(r.status_code))
+        logger.debug("got response from robot: {}".format(r.text))
+        # resp = json.loads(r.text)
+        # msg = resp['text']
+        msg = r.text
+        logger.debug('Response msg:{}.\n'.format(msg))
+
+        self.say(msg, True, onCompleted=self.checkRestore)
 
     def doResponse(self, query, UUID='', onSay=None):
         statistic.report(1)
@@ -123,7 +162,8 @@ class Conversation(object):
             self.interrupt()
             query = self.asr.transcribe(fp)
             utils.check_and_delete(fp)
-            self.doResponse(query, callback, onSay)
+            # self.doResponse(query, callback, onSay)
+            self.getResponse(query, callback, onSay)
         except Exception as e:
             logger.critical(e)
             utils.clean()
