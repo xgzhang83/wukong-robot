@@ -23,12 +23,7 @@ def init():
     if not os.path.exists(constants.CONFIG_PATH):
         os.makedirs(constants.CONFIG_PATH)
     if not os.path.exists(constants.getConfigPath()):
-        yes_no = input("配置文件{}不存在，要创建吗？(y/n)".format(constants.getConfigPath()))
-        if yes_no.lower() == 'y':
-            constants.newConfig()
-            doInit(constants.getConfigPath())
-        else:
-            doInit(constants.getDefaultConfigPath())
+        doInit(constants.getDefaultConfigPath())
     else:
         doInit(constants.getConfigPath())
     has_init = True

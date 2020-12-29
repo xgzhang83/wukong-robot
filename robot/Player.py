@@ -66,7 +66,7 @@ class SoxPlayer(AbstractPlayer):
         self.onCompleteds = []
 
     def doPlay(self):
-        cmd = ['play', str(self.src)]
+        cmd = ['/usr/bin/aplay', '-D', 'hw:0,0', str(self.src)]
         logger.debug('Executing %s', ' '.join(cmd))
         self.proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.playing = True
